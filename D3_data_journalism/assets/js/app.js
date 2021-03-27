@@ -1,5 +1,5 @@
 
-console.log("working");
+console.log("working again");
 
 // Defining SVG area dimensions
 var svgWidth = 960;
@@ -89,24 +89,87 @@ d3.csv("assets/data/data.csv").then(function(journalismData){
     // saying, obtain journalism data. for every 'data' point (data could be anything, x even), obtain the healthcare column values. then find the max of these
 
 
-    // STEP 3
-    // creating the axis function
-
+    // STEP 3: creating the axes functions with d3
+    // ==============================
     var bottomAxis = d3.axisBottom(xLinearScale);
     var leftAxis = d3.axisLeft(yLinearScale);
 
-    // STEP 4: Append Axes to the chart
+    // STEP 4: Appending the Axes to the chart
     // ==============================
-    // appending axis to chart, moving down x axis in relation to parent. so translation
     chartGroup.append("g")
       .attr("transform", `translate(0, ${chartHeight})`)
       .call(bottomAxis);
+    // appending axis to chart, moving down x axis in relation to parent. so translation
 
     chartGroup.append("g")
       .call(leftAxis);
 
 
-})
+    // STEP 5: Creating circles for the data points
+    // ==============================
+    var circlesGroup = chartGroup.selectAll("circle")
+        .data(journalismData) // setting the data to be used
+        .enter() //preparing the add
+        .append("circle") // calling it stateCircle b/c this is defined in d3Style.css
+        .attr("cx", data => xLinearScale(data.poverty)) // defining centre x of the circles by passing poverty data through xLinearScale function
+        .attr("cy", data => yLinearScale(data.healthcare)) // defining centre y values
+        .attr("r", "15") // setting the radius of the circles
+        .attr("fill", "blue")
+        .attr("opacity", ".5");
+
+    
+    
+
+    // STEP 6: Initialising tool tip
+    // ==============================
+    var toolTip = d3.tip().attr("class", "d3-tip").offset([80, -60]).html(function(data) {return (`${data.state}<br>Poverty: ${data.poverty}(%)<br>Healthcare: ${data.healthcare}(%)`);}); // specifying html we want displayed in that tooltip
+
+    // STEP 6: Initialising tool tip
+    // ==============================
+    // var toolTip = d3.tip()
+    //     .attr("class", "tooltip") //maybe this sould be d3-tip b/c that is in css
+    //     .offset([80, -60]) // not exaclty sure what this sets
+    //     .html(function(data) {
+    //         return (`${data.state}<br>Poverty: ${data.poverty}(%)<br>Healthcare: ${data.healthcare}(%)`);
+    //     }); // specifying html we want displayed in that tooltip
+
+    // Step 7: Create tooltip in the chart
+    // ==============================
+    chartGroup.call(toolTip);
+    // tooltip is variable but also function
+    // so doing .call(tooTip) will invoke the function
+
+    // Step 8: Create event listeners to display and hide the tooltip
+    // ==============================
+    circlesGroup.on("click", function(data) {
+      toolTip.show(data, this);
+    })
+      // onmouseout event
+      .on("mouseout", function(data, index) {
+        toolTip.hide(data);
+      }); // hiding tooltip on mouse out
+
+    // Create axes labels
+    // adding text element to svg
+    // y axis??
+    chartGroup.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left + 40)
+      .attr("x", 0 - (chartHeight / 2))
+      .attr("class", "aText") // giving class: set as atext b/c this is in dsStyle.css
+      .text("Lacks Healthcare (%)");
+      //.attr("dy", "1em") // settingsize of text (don't think I need this because in d3style.css);
+
+
+      chartGroup.append("text")
+      .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + margin.top })`) // had + 30 after margin.top but couldnt see 
+      .attr("class", "aText")
+      .text("In Poverty(%)");
+  
+    }).catch(function(error) {
+    console.log(error);
+  });
+
 
 // again, this won't tlink to my html and no changes that I make appear in the console
 // it's like it has been stuck on what it previously was
