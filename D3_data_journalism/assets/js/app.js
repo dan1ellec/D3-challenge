@@ -1,5 +1,5 @@
 
-console.log("working again");
+console.log("working again okay");
 
 // Defining SVG area dimensions
 var svgWidth = 960;
@@ -107,22 +107,52 @@ d3.csv("assets/data/data.csv").then(function(journalismData){
 
     // STEP 5: Creating circles for the data points
     // ==============================
-    var circlesGroup = chartGroup.selectAll("circle")
+    var circlesGroup = chartGroup.selectAll(".stateCircle") // also works with just "circle"
         .data(journalismData) // setting the data to be used
         .enter() //preparing the add
         .append("circle") // calling it stateCircle b/c this is defined in d3Style.css
         .attr("cx", data => xLinearScale(data.poverty)) // defining centre x of the circles by passing poverty data through xLinearScale function
         .attr("cy", data => yLinearScale(data.healthcare)) // defining centre y values
-        .attr("r", "15") // setting the radius of the circles
+        .attr("r", "13") // setting the radius of the circles
+        .attr("class", "stateCircle") // still not linking to .css even when I do this
         .attr("fill", "blue")
-        .attr("opacity", ".5");
+        .attr("opacity", ".7");
 
-    
+    chartGroup.selectAll(".stateText") // adding .stateText helped to get everything to appear. think it is because we are in 'g'. then need to select the class 
+        .data(journalismData) // setting the data to be used
+        .enter() //preparing the add
+        .append("text")
+        .text(data => data.abbr)
+        .attr("dx", data => xLinearScale(data.poverty)) // defining centre x of the circles by passing poverty data through xLinearScale function
+        .attr("dy", data => yLinearScale(data.healthcare))
+        .attr("class", "stateText")
+        .attr('font-size', 10)
+
+
+//         const textElems = svg.append('g')
+// .selectAll('text')
+// .data(nodes)
+// .enter().append('text')
+// .text(node => node.label)
+// .attr('font-size',8)//font size
+// .attr('dx', -10)//positions text towards the left of the center of the circle
+// .attr('dy',4)
+
+//     svg.selectAll("text")
+//        .data(dataset)
+//        .enter()
+//        .append("text")
+//        // Add your code below this line
+//        .text((d) => d)
+//        .attr("x", (d, i) => d[0] + 5)
+//        .attr("y", (d, i) => h - d[1])
     
 
     // STEP 6: Initialising tool tip
     // ==============================
     var toolTip = d3.tip().attr("class", "d3-tip").offset([80, -60]).html(function(data) {return (`${data.state}<br>Poverty: ${data.poverty}(%)<br>Healthcare: ${data.healthcare}(%)`);}); // specifying html we want displayed in that tooltip
+
+    // still don't know what offset does
 
     // STEP 6: Initialising tool tip
     // ==============================
@@ -141,13 +171,14 @@ d3.csv("assets/data/data.csv").then(function(journalismData){
 
     // Step 8: Create event listeners to display and hide the tooltip
     // ==============================
-    circlesGroup.on("click", function(data) {
+    circlesGroup.on("mouseover", function(data) {
       toolTip.show(data, this);
     })
       // onmouseout event
       .on("mouseout", function(data, index) {
         toolTip.hide(data);
       }); // hiding tooltip on mouse out
+// note if change "mouseover" to click then it will only appear when clicking
 
     // Create axes labels
     // adding text element to svg
