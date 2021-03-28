@@ -23,7 +23,8 @@ var chartHeight = svgHeight - margin.top - margin.bottom;
 var svg = d3.select("#scatter")
     .append("svg")
     .attr("width", svgWidth)
-    .attr("height", svgHeight);
+    .attr("height", svgHeight)
+    .classed("chart", true);
 
 
 // Appending a SVG group area, then setting its margins
@@ -71,7 +72,7 @@ var chosenYAxis = "healthcare";
 function yScale(journalismData, chosenYAxis) {
     //setting scales
     var yLinearScale = d3.scaleLinear()
-        .domain(0, d3.max(journalismData, data => data[chosenYAxis]) * 1.2) // have donw from 0 but could do min
+        .domain([d3.min(journalismData, data => data[chosenYAxis]) * 0.8, d3.max(journalismData, data => data[chosenYAxis]) * 1.2]) // have donw from 0 but could do min
         .range([chartHeight, 0]); // scaling the domain so that it fits within the width of the chart
 
     return yLinearScale;
@@ -175,13 +176,14 @@ function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
 
 // Importing data and creating a function for this data
 // note: this is the path from the index file!!!!!!!
-d3.csv("assets/data/data.csv").then(function(journalismData, err){
+d3.csv("assets/data/data.csv").then(function(journalismData){
 
     // accounting for error
-    if (err) throw err;
+    //if (err) throw err;
 
     //testing
     console.log(journalismData);
+    console.log("here");
 
     // STEP 1: parsing data and setting as number
     journalismData.forEach(function(data){
@@ -241,10 +243,10 @@ d3.csv("assets/data/data.csv").then(function(journalismData, err){
         .data(journalismData) // setting the data to be used
         .enter() //preparing the add
         .append("circle") // calling it stateCircle b/c this is defined in d3Style.css
+        .attr("class", "stateCircle") // still not linking to .css even when I do this
         .attr("cx", data => xLinearScale(data[chosenXAxis])) // defining centre x of the circles by passing poverty data through xLinearScale function
         .attr("cy", data => yLinearScale(data[chosenYAxis])) // defining centre y values
         .attr("r", "13") // setting the radius of the circles
-        .attr("class", "stateCircle") // still not linking to .css even when I do this
         .attr("fill", "blue")
         .attr("opacity", ".7");
 
@@ -342,13 +344,13 @@ d3.csv("assets/data/data.csv").then(function(journalismData, err){
 
     // X AXIS labels/values event listener
     xLabelsGroup.selectAll("text")
-        .on("click", function(){
+        .on("click", function() {
 
             //obtaining value of sleection
             var value = d3.select(this).attr("value");
             
             // if the current 'value' we are selecting is not the same as what is currently set for the x axis
-            if (value !==chosenXAxis) {
+            if (value !== chosenXAxis) {
 
                 //replace chosenXAxis with new value
                 chosenXAxis = value;
@@ -381,7 +383,7 @@ d3.csv("assets/data/data.csv").then(function(journalismData, err){
                     incomeLabel
                         .classed("active", false)
                         .classed("inactive", true);
-                }
+                } 
                 else if (chosenXAxis === "age") {
                     povertyLabel
                         .classed("active", false)
