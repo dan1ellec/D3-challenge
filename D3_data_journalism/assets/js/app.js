@@ -273,27 +273,30 @@ d3.csv("assets/data/data.csv").then(function(journalismData){
         .attr("x", 0)
         .attr("y", 20)
         .attr("value", "poverty") // value which will be used for event listener\
-        .classed("active", true) // setting as active as will be initial
         .attr("class", "aText")
+        .classed("active", true)
         .text("In Poverty(%)");
+        //.attr("class", "active").classed("active", true) // setting as active as will be initial
 
     // x axis option 2
     var ageLabel = xLabelsGroup.append("text")
         .attr("x", 0)
         .attr("y", 40)
         .attr("value", "age") // value which will be used for event listener\
-        .classed("inactive", true) // setting as active as will be initial
         .attr("class", "aText")
+        .classed("inactive", true)
         .text("Age (Median)");
+        //.attr("class", "inactive") // setting as active as will be initial
 
     // x axis option 3
     var incomeLabel = xLabelsGroup.append("text")
         .attr("x", 0)
         .attr("y", 60)
         .attr("value", "income") // value which will be used for event listener\
-        .classed("inactive", true) // setting as active as will be initial
         .attr("class", "aText")
+        .classed("inactive", true)
         .text("Household Income (Median)");
+        //.attr("class", "inactive") // setting as active as will be initial
 
     //Y AXIS
 
@@ -323,7 +326,7 @@ d3.csv("assets/data/data.csv").then(function(journalismData){
         .attr("dy", "1em")
         .text("Smokes (%)");
 
-    // y axis option 1
+    // y axis option 3
     var obesityLabel = yLabelsGroup.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - 60)
@@ -346,7 +349,7 @@ d3.csv("assets/data/data.csv").then(function(journalismData){
     xLabelsGroup.selectAll("text")
         .on("click", function() {
 
-            //obtaining value of sleection
+            //obtaining value of selection
             var value = d3.select(this).attr("value");
             
             // if the current 'value' we are selecting is not the same as what is currently set for the x axis
@@ -354,7 +357,7 @@ d3.csv("assets/data/data.csv").then(function(journalismData){
 
                 //replace chosenXAxis with new value
                 chosenXAxis = value;
-
+                
                 // Enacting the functionc created before the csv import
 
                 // updating x scale for new data
@@ -372,6 +375,7 @@ d3.csv("assets/data/data.csv").then(function(journalismData){
                 // updating tooltips with new information
                 circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
 
+                console.log("okay");
                 // updating classes depending on what is selected, sets which is bold
                 if (chosenXAxis === "poverty") {
                     povertyLabel
@@ -416,7 +420,7 @@ d3.csv("assets/data/data.csv").then(function(journalismData){
 
             //obtaining value of sleection
             var value = d3.select(this).attr("value");
-            
+            console.log("yokay")
             // if the current 'value' we are selecting is not the same as what is currently set for the x axis
             if (value !==chosenYAxis) {
 
@@ -463,7 +467,7 @@ d3.csv("assets/data/data.csv").then(function(journalismData){
                         .classed("active", false)
                         .classed("inactive", true);
                 }
-                else if (chosenXAxis === "obesity") {
+                else if (chosenYAxis === "obesity") {
                     healthcareLabel
                         .classed("active", false)
                         .classed("inactive", true);
@@ -473,7 +477,8 @@ d3.csv("assets/data/data.csv").then(function(journalismData){
                     obesityLabel
                         .classed("active", true)
                         .classed("inactive", false);
-                }
+                };
+               
         
             }
         });
