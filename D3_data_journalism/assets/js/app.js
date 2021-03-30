@@ -1,12 +1,9 @@
 
-console.log("updated");
-
 // Defining SVG area dimensions
 var svgWidth = 960;
 var svgHeight = 500;
 
-// Defining the graphs margins as an object
-// will reference these later
+// Defining the margins of the graph as an object
 var margin = {
     top: 60,
     right: 60,
@@ -32,7 +29,7 @@ var chartGroup = svg.append("g")
 // X axis will include: poverty, age, household income
 // Y axis will include: healthcare, smokes, obesity
 
-// UPDATING X VALUES AND AXIS
+// FUNCTIONS FOR X VALUES AND X AXIS
 // ==============================
 
 // Setting an initial parameter for the x axis choice
@@ -62,7 +59,7 @@ function renderXAxis(newXScale, xAxis) {
     return xAxis;
 }
 
-// UPDATING Y VALUES AND AXIS
+// FUNCTIONS FOR Y VALUES AND Y AXIS
 // ==============================
 
 // Setting an initial parameter for the y axis choice
@@ -91,7 +88,7 @@ function renderYAxis(newYScale, yAxis) {
     return yAxis;
 }
 
-// UPDATING CIRCLE DATA AND TOOLTIPS FOR X AND Y
+// FUNCTIONS FOR CIRCLE DATA AND TOOLTIPS 
 // ==============================
 
 // Function which updates circles group when new axes labels are chosen
@@ -118,7 +115,7 @@ function renderText(textGroup, newXScale, chosenXAxis, newYScale, chosenYAxis) {
     return textGroup; 
 }
 
-// Function which updates circles group with a new tool tip when new x Axis label is chosen
+// Function which updates circles group with a new tool tip when new axes labels are chosen
 function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
 
     // setting variables to be used
@@ -126,22 +123,18 @@ function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
     var ylabel;
     var xsign;
     var ysign;
-    var dollarsign;
 
     // if statement determiing variable values based on chosenXAxis
     if (chosenXAxis === "poverty") {
         xlabel = "Poverty:";
         xsign = "%";
-        dollarsign = "";
     }
     else if (chosenXAxis === "age") {
         xlabel = "Age:";
         xsign = " (median)";
-        dollarsign = "";
     }
     else if (chosenXAxis === "income") {
         xlabel = "Income:";
-        var dollarsign = "US$";
         xsign = "US$ (median)";
     };
 
@@ -149,17 +142,14 @@ function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
     if (chosenYAxis === "healthcare") {
         ylabel = "Healthcare:";
         ysign = "%";
-        dollarsign = "";
     }
     else if (chosenYAxis === "smokes") {
         ylabel = "Smokes:";
         ysign = "%";
-        dollarsign = "";
     }
     else if (chosenYAxis === "obesity") {
         ylabel = "Obesity:";
         ysign = "%";
-        dollarsign = "";
     }
 
     // Setting the tooltip features
@@ -167,7 +157,7 @@ function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
         .attr("class", "d3-tip")
         .offset([80, -60])
         .html(function(data) {
-            return (`${data.state}<br>${xlabel} ${dollarsign}${data[chosenXAxis]}${xsign}<br>${ylabel} ${data[chosenYAxis]}${ysign}`);}); // specifying html we want displayed in that tooltip
+            return (`${data.state}<br>${xlabel} ${data[chosenXAxis]}${xsign}<br>${ylabel} ${data[chosenYAxis]}${ysign}`);}); // specifying html we want displayed in that tooltip
 
 
     circlesGroup.call(toolTip);
@@ -184,8 +174,8 @@ function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
 
 // IMPORTING DATA
 // ============================== 
-// Importing data by creating a path from index.html and creating a function for this data
-// Will use the functions created above in this function
+// Importing data by creating a path from index.html 
+// Creating a function for this utilising the functions already created above 
 d3.csv("assets/data/data.csv").then(function(journalismData, err){
 
     // accounting for error
@@ -205,19 +195,17 @@ d3.csv("assets/data/data.csv").then(function(journalismData, err){
         data.smokes = +data.smokes;
     })
 
-    // STEP 2
+    // STEP 2: Creating scales for the axes by using the functions created above with the imported data
     // ==============================
-    // Creating scales for x and y axis by using the functions created above with the imported data
     var xLinearScale = xScale(journalismData, chosenXAxis);    
     var yLinearScale = yScale(journalismData, chosenYAxis);
    
-
-    // STEP 3: creating the axes functions with d3
+    // STEP 3: Creating the axes functions with d3
     // ==============================
     var bottomAxis = d3.axisBottom(xLinearScale);
     var leftAxis = d3.axisLeft(yLinearScale);
 
-    // STEP 4: Appending the Axes to the chart
+    // STEP 4: Appending the axes to the chart
     // ==============================
     var xAxis = chartGroup.append("g")
         .classed("x-axis", true)
@@ -228,16 +216,15 @@ d3.csv("assets/data/data.csv").then(function(journalismData, err){
         .classed("y-axis", true)
         .call(leftAxis);
 
-
     // STEP 5: Creating circles for the data points
     // ==============================
-    var circlesGroup = chartGroup.selectAll(".stateCircle") // also works with just "circle"
+    var circlesGroup = chartGroup.selectAll(".stateCircle") 
         .data(journalismData) // setting the data to be used
         .enter() //preparing the add
-        .append("circle") // calling it stateCircle b/c this is defined in d3Style.css
-        .attr("class", "stateCircle") // still not linking to .css even when I do this
+        .append("circle") 
+        .attr("class", "stateCircle") 
         .attr("cx", data => xLinearScale(data[chosenXAxis])) // defining centre x of the circles by passing poverty data through xLinearScale function
-        .attr("cy", data => yLinearScale(data[chosenYAxis])) // defining centre y values
+        .attr("cy", data => yLinearScale(data[chosenYAxis])) // defining centre y values by passing poverty data through yLinearScale function
         .attr("r", "13") // setting the radius of the circles
         .attr("fill", "blue")
         .attr("opacity", ".7");
@@ -250,49 +237,51 @@ d3.csv("assets/data/data.csv").then(function(journalismData, err){
         .append("text")
         .text(data => data.abbr)
         .attr("dx", data => xLinearScale(data[chosenXAxis])) // defining x position by passing poverty data through xLinearScale function
-        .attr("dy", data => yLinearScale(data[chosenYAxis])) // defining y position
+        .attr("dy", data => yLinearScale(data[chosenYAxis])) // defining y position by passing poverty data through yLinearScale function
         .attr("class", "stateText")
         .attr('font-size', 10)
 
 
-    // STEP 7: CREATING AXES LABELS
+    // STEP 7: Creating axes labels
     // ==============================
     
     // X AXIS
-
+    // =======
+    
     // creating a group for the three x axis options
     var xLabelsGroup = chartGroup.append("g")
-        .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + 20})`) // had + 30 after margin.top but couldnt see 
+        .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + 20})`)  
 
     // x axis option 1
     var povertyLabel = xLabelsGroup.append("text")
-        .attr("x", 0)
-        .attr("y", 20)
-        .attr("value", "poverty") // value which will be used for event listener\
-        .attr("class", "aText")
-        .classed("active", true)
-        .text("In Poverty(%)");        
+        .attr("x", 0) // setting the postion of the label
+        .attr("y", 20) // setting the postion of the label
+        .attr("value", "poverty") // value which will be used for event listener
+        .attr("class", "aText") // setting the class
+        .classed("active", true) // setting the class as "active" so it is bolded initially
+        .text("In Poverty(%)"); // setting the text for the label       
 
     // x axis option 2
     var ageLabel = xLabelsGroup.append("text")
         .attr("x", 0)
         .attr("y", 40)
-        .attr("value", "age") // value which will be used for event listener\
+        .attr("value", "age") // value which will be used for event listener
         .attr("class", "aText")
-        .classed("inactive", true)
+        .classed("inactive", true) // setting initial class as "inactive" 
         .text("Age (Median)");
 
     // x axis option 3
     var incomeLabel = xLabelsGroup.append("text")
         .attr("x", 0)
         .attr("y", 60)
-        .attr("value", "income") // value which will be used for event listener\
+        .attr("value", "income") // value which will be used for event listener
         .attr("class", "aText")
-        .classed("inactive", true)
+        .classed("inactive", true) // setting initial class as "inactive"
         .text("Household Income (Median)");
 
 
     // Y AXIS
+    // =======
 
     // creating a group for the x axis options
     var yLabelsGroup = chartGroup.append("g")
@@ -300,12 +289,12 @@ d3.csv("assets/data/data.csv").then(function(journalismData, err){
 
     // y axis option 1
     var healthcareLabel = yLabelsGroup.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 0 - 20)
-        .attr("x", 0)
-        .attr("class", "aText") // giving class: set as atext b/c this is in dsStyle.css
-        .attr("value", "healthcare")
-        .classed("active", true)
+        .attr("transform", "rotate(-90)") // roatiting label so it is vertical
+        .attr("y", 0 - 20) // setting the postion of the label
+        .attr("x", 0) // setting the postion of the label
+        .attr("class", "aText") 
+        .attr("value", "healthcare") // value which will be used for event listener
+        .classed("active", true) // setting the class as "active" so it is bolded initially
         .attr("dy", "1em")
         .text("Lacks Healthcare (%)");
 
@@ -314,9 +303,9 @@ d3.csv("assets/data/data.csv").then(function(journalismData, err){
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - 40)
         .attr("x", 0)
-        .attr("class", "aText") // giving class: set as atext b/c this is in dsStyle.css
-        .attr("value", "smokes")
-        .classed("inactive", true)
+        .attr("class", "aText") 
+        .attr("value", "smokes") // value which will be used for event listener
+        .classed("inactive", true) // setting initial class as "inactive"
         .attr("dy", "1em")
         .text("Smokes (%)");
 
@@ -326,18 +315,19 @@ d3.csv("assets/data/data.csv").then(function(journalismData, err){
         .attr("y", 0 - 60)
         .attr("x", 0)
         .attr("class", "aText") // giving class: set as atext b/c this is in dsStyle.css
-        .attr("value", "obesity")
-        .classed("inactive", true)
+        .attr("value", "obesity") // value which will be used for event listener
+        .classed("inactive", true) // setting initial class as "inactive"
         .attr("dy", "1em")
         .text("Obese (%)");
 
 
-    // TOOLTIP
-    // updating tooltip function defined above, now with imported data
+    // STEP 8: Updating tooltip function defined above, now with imported data
+    // ==============================
     var circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
 
 
-    // EVENT LISTENERS
+    // STEP 9: Creating event listeners
+    // ==============================
 
     // X AXIS labels/values event listener
     xLabelsGroup.selectAll("text")
@@ -352,7 +342,7 @@ d3.csv("assets/data/data.csv").then(function(journalismData, err){
                 //replace chosenXAxis with new value
                 chosenXAxis = value;
                 
-                // Enacting the functionc created before the csv import
+                // Enacting the functions created before the csv import:
 
                 // updating x scale for new data
                 xLinearScale = xScale(journalismData, chosenXAxis);
@@ -412,16 +402,16 @@ d3.csv("assets/data/data.csv").then(function(journalismData, err){
     yLabelsGroup.selectAll("text")
         .on("click", function(){
 
-            //obtaining value of sleection
+            //obtaining value of selection
             var value = d3.select(this).attr("value");
             console.log("yokay")
-            // if the current 'value' we are selecting is not the same as what is currently set for the x axis
+            // if the current 'value' we are selecting is not the same as what is currently set for the y axis
             if (value !==chosenYAxis) {
 
-                //replace chosenXAxis with new value
+                //replace chosenYAxis with new value
                 chosenYAxis = value;
 
-                // Enacting the functionc created before the csv import
+                // Enacting the functions created before the csv import:
 
                 // updating y scale for new data
                 yLinearScale = yScale(journalismData, chosenYAxis);
@@ -480,63 +470,3 @@ d3.csv("assets/data/data.csv").then(function(journalismData, err){
         console.log(error);
     });
     
-//         // X axis will include: POverty, Age, household income
-// // Y axis will include: healthcare, smokes. obesity
-
-//     // STEP 6: Initialising tool tip
-//     // ==============================
-//     var toolTip = d3.tip().attr("class", "d3-tip").offset([80, -60]).html(function(data) {return (`${data.state}<br>Poverty: ${data.poverty}(%)<br>Healthcare: ${data.healthcare}(%)`);}); // specifying html we want displayed in that tooltip
-
-//     // still don't know what offset does
-
-//     // STEP 6: Initialising tool tip
-//     // ==============================
-//     // var toolTip = d3.tip()
-//     //     .attr("class", "tooltip") //maybe this sould be d3-tip b/c that is in css
-//     //     .offset([80, -60]) // not exaclty sure what this sets
-//     //     .html(function(data) {
-//     //         return (`${data.state}<br>Poverty: ${data.poverty}(%)<br>Healthcare: ${data.healthcare}(%)`);
-//     //     }); // specifying html we want displayed in that tooltip
-
-//     // Step 7: Create tooltip in the chart
-//     // ==============================
-//     chartGroup.call(toolTip);
-//     // tooltip is variable but also function
-//     // so doing .call(tooTip) will invoke the function
-
-//     // Step 8: Create event listeners to display and hide the tooltip
-//     // ==============================
-//     circlesGroup.on("mouseover", function(data) {
-//       toolTip.show(data, this);
-//     })
-//       // onmouseout event
-//       .on("mouseout", function(data, index) {
-//         toolTip.hide(data);
-//       }); // hiding tooltip on mouse out
-// // note if change "mouseover" to click then it will only appear when clicking
-
-//     // Create axes labels
-//     // adding text element to svg
-//     // y axis??
-//     chartGroup.append("text")
-//       .attr("transform", "rotate(-90)")
-//       .attr("y", 0 - margin.left + 40)
-//       .attr("x", 0 - (chartHeight / 2))
-//       .attr("class", "aText") // giving class: set as atext b/c this is in dsStyle.css
-//       .text("Lacks Healthcare (%)");
-//       //.attr("dy", "1em") // settingsize of text (don't think I need this because in d3style.css);
-
-
-//       chartGroup.append("text")
-//       .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + margin.top })`) // had + 30 after margin.top but couldnt see 
-//       .attr("class", "aText")
-//       .text("In Poverty(%)");
-  
-//     }).catch(function(error) {
-//     console.log(error);
-//   });
-
-
-// // again, this won't tlink to my html and no changes that I make appear in the console
-// // it's like it has been stuck on what it previously was
-
